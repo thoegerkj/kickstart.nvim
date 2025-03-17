@@ -175,7 +175,6 @@ vim.keymap.set('n', '<leader>tt', vim.cmd.Ex)
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
 vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
 
-vim.keymap.set('n', '<leader>p', '"+p')
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
 vim.keymap.set('n', 'n', 'nzzzv')
@@ -186,6 +185,10 @@ vim.keymap.set('x', '<leader>p', '"_dP')
 vim.keymap.set('n', '<leader>y', '"+y')
 vim.keymap.set('v', '<leader>y', '"+y')
 vim.keymap.set('n', '<leader>Y', '"+Y')
+vim.keymap.set('n', '<leader>p', '"+p')
+vim.keymap.set('v', '<leader>p', '"+p')
+vim.keymap.set('n', '<leader>P', '"+P')
+vim.keymap.set('v', '<leader>P', '"+P')
 
 vim.keymap.set('n', '<leader>d', '"_d')
 vim.keymap.set('v', '<leader>d', '"_d')
@@ -194,14 +197,20 @@ vim.keymap.set('n', 'Q', '<nop>')
 
 vim.keymap.set('n', '<leader>s', ':%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gI<Left><Left><Left>')
 
-vim.keymap.set('n', '<C-CR>', ':w<CR>')
-
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+
+-- Try alternative mapping for Ctrl+Enter
+vim.api.nvim_set_keymap('n', '<C-m>', ':w<CR>', { noremap = true, silent = true })
+
+vim.api.nvim_set_keymap('i', '<A-h>', '<Left>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('i', '<A-j>', '<Down>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('i', '<A-k>', '<Up>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('i', '<A-l>', '<Right>', { noremap = true, silent = true })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -212,10 +221,14 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 -- TIP: Disable arrow keys in normal mode
--- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
--- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
--- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
--- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
+vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
+vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
+vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+vim.keymap.set('i', '<left>', '<cmd>echo "Use Alt + h to move!!"<CR>')
+vim.keymap.set('i', '<right>', '<cmd>echo "Use Alt + l to move!!"<CR>')
+vim.keymap.set('i', '<up>', '<cmd>echo "Use Alt + k to move!!"<CR>')
+vim.keymap.set('i', '<down>', '<cmd>echo "Use Alt + j to move!!"<CR>')
 
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
@@ -1058,5 +1071,44 @@ require('lazy').setup({
   },
 })
 
+--Be able to initialise latex documents easily.
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'tex',
+  callback = function()
+    vim.api.nvim_set_keymap('n', '<leader>lp', ':lua InsertLatexTemplate()<CR>', { noremap = true, silent = true })
+  end,
+})
+
+function InsertLatexTemplate()
+  local filename = vim.fn.expand '%:t:r' -- Extracts the file name without extension
+
+  local template = string.format(
+    [[
+\documentclass[a4paper, 10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[danish]{babel}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[a4paper,left=1in,right=1in,top=1in,bottom=1in]{geometry}
+
+\title{%s}
+\author{Thøger Kaasgaard Jakobsen}
+\date{\today}
+
+\begin{document}
+
+
+\maketitle
+
+\section{Introduction}
+...
+
+\end{document}]],
+    filename
+  )
+
+  local bufnr = vim.api.nvim_get_current_buf()
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, vim.split(template, '\n'))
+end
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
