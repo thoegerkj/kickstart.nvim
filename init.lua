@@ -1090,6 +1090,8 @@ function InsertLatexTemplate()
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage[a4paper,left=1in,right=1in,top=1in,bottom=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
 
 \title{%s}
 \author{Thøger Kaasgaard Jakobsen}
