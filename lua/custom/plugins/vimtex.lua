@@ -1,7 +1,7 @@
 return {
   'lervag/vimtex',
   config = function()
-    vim.g.vimtex_view_method = 'general'
+    vim.g.vimtex_view_method = 'zathura'
     vim.g.vimtex_compiler_method = 'latexmk'
     vim.keymap.set('n', '<leader>lv', ':VimtexView<CR>', { desc = 'Open PDF viewer' })
     vim.g.vimtex_syntax_enabled = 1
